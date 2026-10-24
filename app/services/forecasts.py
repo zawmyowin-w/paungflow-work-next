@@ -132,13 +132,14 @@ class ForecastService:
         metrics = backtest_metrics(values, model_key)
         backtest = backtest_predictions(values, model_key)
         rolling = rolling_backtest_series(values, model_key)
+        predicted_by_index = {item.index: item.predicted for item in rolling}
         history = tuple(
             SeriesComparison(
-                label=dataset.points[item.index].label,
-                actual=item.actual,
-                predicted=item.predicted,
+                label=point.label,
+                actual=point.value,
+                predicted=predicted_by_index.get(index),
             )
-            for item in rolling
+            for index, point in enumerate(dataset.points)
         )
         validation = tuple(
             SeriesComparison(
