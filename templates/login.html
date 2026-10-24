@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123d72">
+  <title>Admin sign in · Lower Paungluang Dam</title>
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body class="login-body">
+  <main class="login-shell">
+    <section class="login-visual" aria-label="Lower Paung-Luang Dam">
+      <img class="login-photo" src="/static/images/lower-paunglaung-dam.jpg" alt="Lower Paung-Luang Dam and reservoir">
+      <div class="login-photo-shade"></div>
+      <div class="login-visual-content">
+        <div class="brand-mark brand-mark-large" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none"><path d="M8 14h48v29H8z" fill="currentColor" opacity=".95"/><path d="M15 19 9 43m17-24-6 24m18-24-6 24m18-24-6 24" stroke="#123d72" stroke-width="4"/><path d="M6 50c5-5 10 5 15 0s10 5 15 0 10 5 15 0 10 5 15 0M6 58c5-5 10 5 15 0s10 5 15 0 10 5 15 0 10 5 15 0" stroke="#b8edff" stroke-width="3.5" stroke-linecap="round"/></svg>
+        </div>
+        <p class="eyebrow light-eyebrow">DATA DRIVEN · SAFER DAM · SUSTAINABLE FUTURE</p>
+        <h1>Lower Paunglaung<br>Dam Inflow Forecasting</h1>
+        <p class="visual-copy">A secure operations console for monitoring reservoir data and reviewing inflow forecasts.</p>
+        <div class="visual-location"><span class="location-pip"></span> Pyinmana Township · Myanmar</div>
+      </div>
+      <div class="login-image-caption">Lower Paung-Luang Dam <span>·</span> Myanmar</div>
+    </section>
+    <section class="login-panel">
+      <!-- <div class="login-panel-top"><span>OPERATIONS PORTAL</span><span class="secure-label"><i></i> SECURE ACCESS</span></div> -->
+      <div class="login-form-wrap">
+        <div class="login-mini-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none"><path d="M8 13h48v30H8z" fill="currentColor"/><path d="M14 19 8 43m17-24-6 24m18-24-6 24m18-24-6 24" stroke="#fff" stroke-width="4"/><path d="M5 50c5-5 10 5 15 0s10 5 15 0 10 5 15 0 10 5 15 0M5 58c5-5 10 5 15 0s10 5 15 0 10 5 15 0 10 5 15 0" stroke="#3ba4d7" stroke-width="3.5" stroke-linecap="round"/></svg>
+        </div>
+        <p class="eyebrow">ADMINISTRATOR SIGN IN</p>
+        <h2>Access the control room</h2>
+        <p class="login-subtitle">{% if local_auth_enabled %}Sign in to this local workspace to manage datasets and dam inflow forecasts.{% else %}Sign in with your Manus account to manage datasets and dam inflow forecasts.{% endif %}</p>
+        {% if auth_error %}<div class="login-alert" role="alert">Sign-in could not be completed. Please try again.</div>{% endif %}
+        {% if not_admin %}<div class="login-alert" role="alert">This Manus account is authenticated but does not have administrator access.</div>{% endif %}
+        {% if local_login_error %}<div class="login-alert" role="alert">The local username or password was incorrect. Please try again.</div>{% endif %}
+        {% if local_auth_enabled %}
+        <form class="local-login-form" action="/auth/local-login" method="post">
+          <label>Username</label><input name="username" value="{{ local_username }}" autocomplete="username" required>
+          <label>Password</label><input name="password" type="password" autocomplete="current-password" required>
+          <button class="manus-signin" type="submit">Sign in</button>
+        </form>
+        <p class="local-login-note">Local-only authentication · do not expose this development server to the internet.</p>
+        <!-- {% else %}
+        <a class="manus-signin" id="signin-button" href="/auth/login?origin={{ login_origin }}">
+          <span class="manus-symbol">M</span><span>Continue with Manus</span><span class="signin-arrow" aria-hidden="true">→</span>
+        </a>
+        {% endif %}
+        <div class="login-divider"><span></span><small>ACCOUNT SECURITY</small><span></span></div>
+        <div class="login-security-note">
+          <span class="security-icon" aria-hidden="true">✓</span>
+          <p>Your account is verified through Manus. The dashboard opens only after an authenticated session is established.</p>
+        </div>
+        <div class="bootstrap-note"><strong>First access:</strong> {% if local_auth_enabled %}The configured local account is registered as the system administrator.{% else %}The first authenticated Manus account is registered as the system administrator. Later accounts need administrator approval.{% endif %}</div>
+        <div class="login-meta"><span>LOWER PAUNG-LUANG DAM</span><span>MYANMAR · ADMIN CONSOLE</span></div>
+      </div>
+      <div class="login-panel-footer"><span>Data Driven</span><i></i><span>Safer Dam</span><i></i><span>Sustainable Future</span></div> -->
+    </section>
+  </main>
+</body>
+</html>

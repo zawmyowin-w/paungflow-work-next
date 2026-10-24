@@ -1,0 +1,5 @@
+# Visual asset sources
+
+- **Lower Paung-Luang Dam photograph** — image-search result titled “Inspection of Lower Paunglaung Dam: MOALI UM inspected Lower Paunglaung Dam”, source listed as Myanmar International TV. Retrieved image URL: https://files.manuscdn.com/search-media/310519663868637013/LudnLmr3nt60aQzKG72WHa/hMenwodRDZpsLN5Sdhzp8M.jpg. The site serves the local copy at `static/images/lower-paunglaung-dam.jpg` under `/static/images/lower-paunglaung-dam.jpg`.
+- **Myanmar map image** — image-search result titled “Physical Map of the Country of Myanmar Colored Stock Illustration”. Retrieved image URL: https://files.manuscdn.com/search-media/310519663868637013/LudnLmr3nt60aQzKG72WHa/2uTq7aaqtLbF4zvPLC7n5G.jpg. The site serves the local copy at `static/images/myanmar-map.jpg` under `/static/images/myanmar-map.jpg`.
+- **Dam mark** — original SVG created for this dashboard. Public project-logo URL: https://files.manuscdn.com/user_upload_by_module/session_file/310519663868637013/oRIUwKLcclnMgETd.svg; local source: `static/images/dam-mark.svg`.

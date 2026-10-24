@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123d72">
+  <title>Lower Paungluang Dam Inflow Forecasting System</title>
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body class="dashboard-body" data-theme="{{ theme }}">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M8 13h48v30H8z" fill="currentColor"/><path d="M14 19 8 43m17-24-6 24m18-24-6 24m18-24-6 24" stroke="#123d72" stroke-width="4"/><path d="M5 50c5-5 10 5 15 0s10 5 15 0 10 5 15 0 10 5 15 0M5 58c5-5 10 5 15 0s10 5 15 0 10 5 15 0 10 5 15 0" stroke="#b8edff" stroke-width="3.5" stroke-linecap="round"/></svg></div>
+      <div><h1>Lower Paung-Luang Dam Inflow Forecasting System</h1><p>Data Driven <span>|</span> Safer Dam <span>|</span> Sustainable Future</p></div>
+    </div>
+    <div class="topbar-actions">
+      <div class="live-clock"><span class="clock-icon" aria-hidden="true">◷</span><div><strong id="clock-date">{{ clock_date }}</strong><small id="clock-time">{{ clock_time }}</small></div></div>
+      <form class="theme-form" action="/theme/toggle" method="post">
+        <input type="hidden" name="next" value="/dashboard">
+        <button class="icon-button theme-toggle" type="submit" aria-label="Switch to {{ theme_label }} mode" title="Toggle light/dark mode"><span aria-hidden="true">{{ theme_icon }}</span></button>
+      </form>
+      <div class="account-chip"><span class="avatar-dot">{{ user.name[:1] if user.name else 'A' }}</span><span class="account-name">{{ user.name }}</span></div>
+      <form action="/auth/logout" method="post"><button class="logout-button" type="submit">Sign out</button></form>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    {% if message %}
+    <div class="flash-message{% if message_level == 'error' %} error{% endif %}" role="status">{{ message }}</div>
+    {% endif %}
+
+    <section class="action-grid" aria-label="Forecast actions">
+      <form class="action-card action-upload" action="/datasets/upload" method="post" enctype="multipart/form-data">
+        <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="11" rx="16" ry="6" fill="currentColor" opacity=".95"/><path d="M8 11v23c0 3.5 7.2 6.5 16 6.5s16-3 16-6.5V11" fill="currentColor" opacity=".75"/><path d="M8 20c0 3.5 7.2 6.5 16 6.5S40 23.5 40 20M8 29c0 3.5 7.2 6.5 16 6.5S40 32.5 40 29" stroke="rgba(255,255,255,.65)" stroke-width="2"/></svg></span>
+        <span class="action-copy"><strong>Load Dataset</strong><small>Upload &amp; prepare data</small></span>
+        <input class="action-file-input" type="file" name="file" accept=".csv,text/csv" required>
+        <button class="action-upload-button" type="submit">Upload</button>
+      </form>
+      <form class="action-run-form" id="run-form" method="post" action="/forecast/lstm">
+        <input type="hidden" name="dataset_id" value="{{ dataset.id if dataset else '' }}">
+        <button class="action-card action-lstm" type="submit" formaction="/forecast/lstm" {% if not dataset %}disabled{% endif %}>
+          <span class="action-icon neural-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="m8 12 13 5m6 1 12-8M9 14l2 17m3 4 11 5m3-2 10-9m-3-4-7-6m-8 1-8 11m18-3 9-16M16 12l6-5m4 14 3 12" stroke="currentColor" stroke-width="1.6"/><g fill="currentColor"><circle cx="7" cy="11" r="3"/><circle cx="15" cy="13" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="29" cy="19" r="3"/><circle cx="41" cy="8" r="3"/><circle cx="12" cy="33" r="3"/><circle cx="25" cy="40" r="3"/><circle cx="39" cy="29" r="3"/></g></svg></span>
+          <span class="action-copy"><strong>LSTM</strong><small>Run LSTM model</small></span><span class="action-chevron">→</span>
+        </button>
+        <button class="action-card action-gru" type="submit" formaction="/forecast/gru" {% if not dataset %}disabled{% endif %}>
+          <span class="action-icon neural-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="m8 12 13 5m6 1 12-8M9 14l2 17m3 4 11 5m3-2 10-9m-3-4-7-6m-8 1-8 11m18-3 9-16M16 12l6-5m4 14 3 12" stroke="currentColor" stroke-width="1.6"/><g fill="currentColor"><circle cx="7" cy="11" r="3"/><circle cx="15" cy="13" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="29" cy="19" r="3"/><circle cx="41" cy="8" r="3"/><circle cx="12" cy="33" r="3"/><circle cx="25" cy="40" r="3"/><circle cx="39" cy="29" r="3"/></g></svg></span>
+          <span class="action-copy"><strong>GRU</strong><small>Run GRU model</small></span><span class="action-chevron">→</span>
+        </button>
+        <button class="action-card action-rgf" type="submit" formaction="/forecast/rgf-lstm" {% if not dataset %}disabled{% endif %}>
+          <span class="action-icon neural-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="m8 12 13 5m6 1 12-8M9 14l2 17m3 4 11 5m3-2 10-9m-3-4-7-6m-8 1-8 11m18-3 9-16M16 12l6-5m4 14 3 12" stroke="currentColor" stroke-width="1.6"/><g fill="currentColor"><circle cx="7" cy="11" r="3"/><circle cx="15" cy="13" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="29" cy="19" r="3"/><circle cx="41" cy="8" r="3"/><circle cx="12" cy="33" r="3"/><circle cx="25" cy="40" r="3"/><circle cx="39" cy="29" r="3"/></g></svg></span>
+          <span class="action-copy"><strong>RGF-LSTM</strong><small>Run RGF-LSTM model</small></span><span class="action-chevron">→</span>
+        </button>
+      </form>
+    </section>
+
+    <section class="overview-grid">
+      <article class="panel map-panel">
+        <div class="panel-heading"><div class="heading-icon pin-icon">⌖</div><div><h2>Dam Location</h2><p>Paunglaung River basin · Myanmar</p></div><span class="panel-status"><i></i> MANDALAY REGION</span></div>
+        <div class="map-toolbar"><span>MYANMAR · OVERVIEW</span><div>
+          <label class="map-zoom-button" for="map-zoom-out" aria-label="Zoom out">−</label>
+          <label class="map-zoom-button" for="map-zoom-reset" aria-label="Reset map">⌂</label>
+          <label class="map-zoom-button" for="map-zoom-in" aria-label="Zoom in">＋</label>
+        </div></div>
+        <div class="map-viewport" id="map-viewport">
+          <input class="map-zoom-input" type="radio" name="map-zoom" id="map-zoom-out">
+          <input class="map-zoom-input" type="radio" name="map-zoom" id="map-zoom-reset" checked>
+          <input class="map-zoom-input" type="radio" name="map-zoom" id="map-zoom-in">
+          <div class="map-scene" id="map-scene"><img class="myanmar-map-image" src="/static/images/myanmar-map.jpg" alt="Map of Myanmar"><div class="map-pin" title="Lower Paung-Luang Dam"><span></span><b>Lower Paung-Luang Dam</b></div><div class="map-river-line"></div></div>
+          <div class="north-indicator">N<span>▲</span></div>
+          <div class="map-legend"><span><i class="legend-dam"></i> Lower Paung-Luang Dam</span><span><i class="legend-river"></i> Paunglaung River</span><span><i class="legend-capital">★</i> Nay Pyi Taw</span></div>
+          <div class="map-caption">Approximate basin overview · Use + / − to explore</div>
+        </div>
+      </article>
+
+      <article class="panel info-panel">
+        <div class="panel-heading"><div class="heading-icon dam-icon">▤</div><div><h2>Dam Information</h2><p>Infrastructure profile</p></div><span class="info-badge">HYDROPOWER</span></div>
+        <div class="info-table">
+          <div class="info-row"><span>Dam Name</span><strong>Lower Paung-Luang Dam</strong></div>
+          <div class="info-row"><span>River</span><strong>Paunglaung River</strong></div>
+          <div class="info-row"><span>Location</span><strong>Pyinmana Township,<br>Mandalay Region</strong></div>
+          <div class="info-row"><span>Coordinates</span><strong>21°27′17″ N,<br>94°41′59″ E</strong></div>
+          <div class="info-row"><span>Type</span><strong>Concrete gravity dam</strong></div>
+          <div class="info-row"><span>Upstream Dam</span><strong>Upper Paung-Luang Dam<br><small>≈ 40 km upstream</small></strong></div>
+          <div class="info-row"><span>Full Reservoir Level (F.T.L.)</span><strong>623.39 ft <small>(≈ 189.96 m)</small></strong></div>
+          <div class="info-row"><span>Dead Water Level (D.W.L.)</span><strong>541.36 ft <small>(≈ 165.04 m)</small></strong></div>
+          <div class="info-row"><span>Total Storage Capacity</span><strong>549,420 acre-ft <small>(≈ 677.9 million m³)</small></strong></div>
+          <div class="info-row"><span>Installed Capacity</span><strong>280 MW <small>4 × 70 MW (Francis-type)</small></strong></div>
+          <div class="info-row purpose-row"><span>Primary Purpose</span><strong><i>Flood prevention</i><i>Water supply</i><i>Renewable energy</i><i>Fisheries &amp; tourism</i></strong></div>
+          <div class="info-row"><span>Rainfall Data Source</span><strong>Upper Paung-Luang Dam</strong></div>
+        </div>
+        <!-- <div class="about-callout"><span class="callout-info">i</span><div><strong>About the Project</strong><p>Inflow forecasts support reservoir operations, irrigation planning and safer water allocation for the Mandalay Region.</p></div></div> -->
+      </article>
+
+      <aside class="side-column">
+        <article class="panel photo-panel"><img src="/static/images/lower-paunglaung-dam.jpg" alt="Lower Paung-Luang Dam and reservoir"><div class="photo-caption"><strong>Lower Paung-Luang Dam</strong><span>Paunglaung River</span></div></article>
+        <article class="panel key-panel">
+          <div class="panel-heading compact-heading"><div class="heading-icon bars-icon">▥</div><div><h2>Key Features</h2><p>Reference specifications</p></div></div>
+          <div class="ops-metrics" aria-label="Live operational indicators">
+            <div class="ops-metric"><small>Current inflow</small><strong>{{ current_inflow }}</strong><em>{{ inflow_label }}</em></div>
+            <div class="ops-metric"><small>Forecast horizon</small><strong>{{ horizon }} steps</strong><em>Selected window</em></div>
+            <div class="ops-metric"><small>Dataset status</small><strong>{{ feature_dataset_status }}</strong><em>{{ feature_dataset_caption }}</em></div>
+            <div class="ops-metric"><small>Model status</small><strong>{{ feature_model_status }}</strong><em>{{ feature_model_caption }}</em></div>
+          </div>
+          <div class="metric-stack">
+            <div class="metric-card"><span class="metric-icon droplet">◆</span><div><small>F.T.L.</small><strong>623.39 ft</strong><em>≈ 189.96 m</em></div></div>
+            <div class="metric-card"><span class="metric-icon waves">≋</span><div><small>D.W.L.</small><strong>541.36 ft</strong><em>≈ 165.04 m</em></div></div>
+            <div class="metric-card"><span class="metric-icon storage">▰</span><div><small>Storage Capacity</small><strong>549,420 acre-ft</strong><em>≈ 677.9 million m³</em></div></div>
+            <div class="metric-card"><span class="metric-icon power">ϟ</span><div><small>Installed Capacity</small><strong>280 MW</strong><em>4 × 70 MW</em></div></div>
+          </div>
+          <!-- <div class="why-callout"><span class="shield-icon">◆</span><div><strong>Why It Matters</strong><p>Accurate inflow prediction can support flood readiness, efficient water allocation and safer dam operations.</p></div></div> -->
+        </article>
+      </aside>
+    </section>
+
+    <section class="forecast-section panel">
+      <div class="forecast-heading">
+        <div class="panel-heading"><div class="heading-icon chart-icon">⌁</div><div><h2>Inflow Forecast &amp; Model Comparison</h2><p>Compare forecast series and backtest error metrics</p></div></div>
+        <div class="forecast-tools">
+          <label for="horizon-select">Horizon</label>
+          <select id="horizon-select" name="horizon" form="run-form">
+            {% for choice in horizon_choices %}
+            <option value="{{ choice }}" {% if choice == horizon %}selected{% endif %}>{{ choice }} steps</option>
+            {% endfor %}
+          </select>
+          <form action="/datasets/sample" method="post"><button class="sample-button" type="submit">Try synthetic sample</button></form>
+        </div>
+      </div>
+      <div class="dataset-strip{% if dataset_ready %} ready{% endif %}"><span class="dataset-dot"></span><div><strong>{{ dataset_name }}</strong><small>{{ dataset_meta }}</small></div><span class="dataset-status">{{ dataset_status }}</span></div>
+      <div class="forecast-content">
+        <div class="chart-wrap"><div class="chart-label-row"><span>Inflow series <small>dataset units</small></span><span class="chart-period">{{ chart_period }}</span></div>{{ chart }}<div class="chart-legend"><span><i class="legend-line historical-line"></i>Historical</span><span><i class="legend-line lstm-line"></i>LSTM</span><span><i class="legend-line gru-line"></i>GRU</span><span><i class="legend-line rgf-line"></i>RGF-LSTM</span></div></div>
+        <div class="comparison-wrap"><div class="comparison-title"><strong>Latest model runs</strong><span>{{ run_count }} saved</span></div><div class="comparison-table">
+          {% if comparison_rows %}
+          <div class="comparison-row header"><span>Model</span><span>MAE</span><span>RMSE</span><span>MAPE</span></div>
+          {% for row in comparison_rows %}
+          <div class="comparison-row"><strong class="model-name"><i class="model-swatch" style="background:{{ row.color }}"></i>{{ row.model_name }}</strong><span>{{ row.mae }}</span><span>{{ row.rmse }}</span><span>{{ row.mape }}%</span></div>
+          {% endfor %}
+          {% else %}
+          <div class="comparison-empty">Run a model to see its metrics here.</div>
+          {% endif %}
+        </div><div class="engine-note">{{ engine_note }}</div></div>
+      </div>
+    </section>
+
+    <footer class="dashboard-footer"><span>Lower Paung-Luang Dam Inflow Forecasting System</span><span>Myanmar</span><span>Python · Admin Console</span></footer>
+  </main>
+  <script src="/static/js/dashboard.js" defer></script>
+</body>
+</html>

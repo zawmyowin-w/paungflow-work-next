@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123f74">
+  <title>{{ model_title }} - Prediction Results</title>
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/results.css">
+</head>
+<body class="results-body" data-theme="{{ theme }}">
+  <header class="results-topbar">
+    <a class="results-brand" href="/dashboard" aria-label="Return to dashboard">
+      <span class="results-brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M4 14c8 0 8-7 16-7s8 7 16 7 8-7 12-7M4 24c8 0 8-7 16-7s8 7 16 7 8-7 12-7M4 34c8 0 8-7 16-7s8 7 16 7 8-7 12-7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m5 39 8 4 11-7 12 6 7-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="results-brand-title">Reservoir Inflow Prediction System</span>
+    </a>
+    <div class="results-top-actions">
+      <a class="results-back" href="/dashboard"><span aria-hidden="true">←</span> Back</a>
+      <strong class="results-page-title"><span>{{ model_title }}</span> - Prediction Results</strong>
+      <form class="theme-form" action="/theme/toggle" method="post">
+        <input type="hidden" name="next" value="{{ return_path }}">
+        <button class="icon-button results-theme-toggle" type="submit" aria-label="Switch to {{ theme_label }} mode" title="Toggle light/dark mode"><span aria-hidden="true">{{ theme_icon }}</span></button>
+      </form>
+      <div class="account-chip results-account"><span class="avatar-dot">{{ user.name[:1] if user.name else 'A' }}</span><span class="account-name">{{ user.name }}</span></div>
+      <form action="/auth/logout" method="post"><button class="logout-button" type="submit">Sign out</button></form>
+    </div>
+  </header>
+
+  <main class="results-wrap">
+    <div class="results-summary">
+      <div><span class="results-kicker">FORECAST RUN</span><h1>{{ model_title }} prediction results</h1><p>{{ subtitle }}</p></div>
+      <span class="results-model-pill">{{ model_title }}</span>
+    </div>
+
+    <section class="results-panel results-history-panel" aria-labelledby="history-title">
+      <div class="results-panel-heading">
+        <span class="results-heading-icon" aria-hidden="true">▥</span>
+        <div><h2 id="history-title">1. Actual vs Predicted Inflow</h2><p>{{ history_caption }}</p></div>
+        <div class="results-legend"><span><i class="legend-actual"></i>Actual Inflow</span><span><i class="legend-predicted"></i>Predicted Inflow</span></div>
+      </div>
+      <div class="results-chart-box">{{ line_chart }}</div>
+    </section>
+
+    <section class="results-grid" aria-label="Prediction details">
+      <article class="results-panel result-forecast-panel">
+        <div class="results-panel-heading compact-results-heading"><span class="results-heading-icon" aria-hidden="true">▦</span><div><h2>{{ forecast_title }}</h2><p>Future values by the selected model run</p></div></div>
+        <div class="results-table-wrap"><table class="results-table"><thead><tr><th>Step</th><th>Forecast Date</th><th>{{ forecast_value_heading }}</th></tr></thead><tbody>
+          {% for row in forecast_rows %}
+          <tr><td>+{{ row.step }}</td><td>{{ row.label }}</td><td><strong>{{ row.value }}</strong></td></tr>
+          {% else %}
+          <tr><td colspan="3" class="results-empty-cell">No forecast values were saved.</td></tr>
+          {% endfor %}
+        </tbody></table></div>
+      </article>
+
+      <article class="results-panel result-metrics-panel">
+        <div class="results-panel-heading compact-results-heading"><span class="results-heading-icon metrics-heading-icon" aria-hidden="true">▥</span><div><h2>3. Performance Evaluation</h2><p>Trailing holdout comparison</p></div></div>
+        <div class="results-table-wrap"><table class="results-table metrics-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>
+          <tr><th scope="row">RMSE</th><td>{{ metric_rmse }}</td></tr>
+          <tr><th scope="row">R²</th><td>{{ metric_r2 }}</td></tr>
+          <tr><th scope="row">MAE</th><td>{{ metric_mae }}</td></tr>
+        </tbody></table></div>
+        <p class="metric-footnote">{{ metric_footnote }}</p>
+      </article>
+
+      <article class="results-panel result-scatter-panel">
+        <div class="results-panel-heading compact-results-heading"><span class="results-heading-icon scatter-heading-icon" aria-hidden="true">⠿</span><div><h2>4. Scatter Plot</h2><p>Actual vs predicted · holdout</p></div></div>
+        <div class="scatter-chart-box">{{ scatter_chart }}</div>
+      </article>
+    </section>
+
+    <div class="results-notice{% if notice_class %} {{ notice_class }}{% endif %}" role="status">{{ notice }}</div>
+    <footer class="results-footer"><span>{{ dataset_summary }}</span><span>{{ engine_note }}</span></footer>
+  </main>
+</body>
+</html>

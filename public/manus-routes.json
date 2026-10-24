@@ -1,0 +1,1 @@
+{"routes":[{"path":"/","title":"Admin Login"},{"path":"/dashboard","title":"Dam Forecast Dashboard"},{"path":"/results/:model","title":"Model Prediction Results"}]}
