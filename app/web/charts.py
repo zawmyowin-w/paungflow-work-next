@@ -148,9 +148,8 @@ def actual_vs_predicted_chart(history: Sequence[SeriesComparison], unit: str) ->
     if not history:
         return _empty_svg(LINE_VIEWBOX, EMPTY_LINE)
 
-    height = 360
+    width, height = 1160, 360
     left, right, top, bottom = 75, 24, 24, 62
-    width = max(1160, left + right + (len(history) - 1) * 20)
     chart_width = width - left - right
     chart_height = height - top - bottom
     values: list[float] = []
@@ -196,21 +195,7 @@ def actual_vs_predicted_chart(history: Sequence[SeriesComparison], unit: str) ->
         'stroke-dasharray="8 5" stroke-linejoin="round" stroke-linecap="round"/>'
     )
 
-    tick_count = min(len(history), max(1, chart_width // 100 + 1))
-    label_indices = (
-        [round(step * (len(history) - 1) / (tick_count - 1)) for step in range(tick_count)]
-        if tick_count > 1
-        else [0]
-    )
-    for index, row in enumerate(history):
-        details = f"Date: {row.label} · Actual inflow: {number(row.actual)} {unit}"
-        if row.predicted is not None:
-            details += f" · Predicted inflow: {number(row.predicted)} {unit}"
-        parts.append(
-            f'<circle cx="{x_of(index):.2f}" cy="{y_of(row.actual):.2f}" r="2.5" '
-            f'fill="{ACTUAL_COLOR}"><title>{escape(details)}</title></circle>'
-        )
-
+    label_indices = [0, len(history) // 4, len(history) // 2, 3 * (len(history) - 1) // 4, len(history) - 1]
     for index in dict.fromkeys(label_indices):
         anchor = "start" if index == 0 else "end" if index == len(history) - 1 else "middle"
         parts.append(
@@ -236,8 +221,7 @@ def actual_vs_predicted_chart(history: Sequence[SeriesComparison], unit: str) ->
     )
 
     return Markup(
-        f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
-        f'style="width:{width}px;height:{height}px;max-width:none;min-height:0" role="img" '
+        f'<svg viewBox="{LINE_VIEWBOX}" role="img" '
         f'aria-label="Actual and predicted inflow over time">{"".join(parts)}</svg>'
     )
 
